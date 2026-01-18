@@ -1,6 +1,6 @@
 {
   "name": "di-sacala",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Small type-safe dependency injection lib",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,8 +17,12 @@
     "format:check": "prettier --check \"src/**/*.ts\""
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Andrei Monkin",
+    "email": "monkin.andrey@gmail.com",
+    "url": "https://github.com/monkin"
+  },
+  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/node": "^25.0.9",
