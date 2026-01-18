@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DiContainer, DiService } from "./di-sacala";
+import { Di, DiContainer, DiService } from './di-sacala';
 
 class RandomNumberService implements DiService<"randomNumber"> {
     name = "randomNumber" as const;
@@ -14,6 +14,15 @@ class DelayService implements DiService<"delay"> {
     constructor() {}
     async wait() {
         return Promise.resolve();
+    }
+}
+
+class IdService implements DiService<"id"> {
+    name = "id" as const;
+    private counter = 0;
+    constructor(private di: Di<RandomNumberService>) {}
+    generate() {
+        return `${this.counter++}-${this.di.randomNumber.next()}`;
     }
 }
 
@@ -48,6 +57,22 @@ describe("DiContainer", () => {
         const result = container.dependent.getWrappedRandom();
         expect(result).toHaveProperty("value");
         expect(typeof result.value).toBe("number");
+    });
+
+    it("should inject IdService and generate ids using RandomNumberService", () => {
+        const container = new DiContainer().inject(RandomNumberService).inject(IdService);
+
+        expect(container.id).toBeInstanceOf(IdService);
+        
+        const id1 = container.id.generate();
+        const [counter1, rand1] = id1.split("-");
+        expect(counter1).toBe("0");
+        expect(Number(rand1)).toBeGreaterThanOrEqual(0);
+
+        const id2 = container.id.generate();
+        const [counter2, rand2] = id2.split("-");
+        expect(counter2).toBe("1");
+        expect(Number(rand2)).toBeGreaterThanOrEqual(0);
     });
 
     it("should merge containers using injectContainer", () => {

@@ -13,10 +13,10 @@ export interface DiService<Name extends string> {
  * Example: Service<"logger"> -> { logger: Service<"logger"> }
  * Example: [Service<"a">, Service<"b">] -> { a: Service<"a"> } & { b: Service<"b"> }
  */
-export type DiSacala<S> = S extends [infer S1, ...infer Tail]
-    ? DiSacala<S1> & DiSacala<Tail>
+export type Di<S> = S extends [infer S1, ...infer Tail]
+    ? Di<S1> & Di<Tail>
     : S extends []
-      ? {}
+      ? unknown
       : S extends DiService<infer Name>
         ? { [Key in Name]: S }
         : never;
@@ -37,7 +37,7 @@ export class DiContainer {
      * @param dependency - A constructor for the service, which receives the container as its only argument.
      * @returns The container instance, typed with the newly added service.
      */
-    inject<S extends DiService<string>>(dependency: new (dependencies: this) => S): this & DiSacala<S> {
+    inject<S extends DiService<string>>(dependency: new (dependencies: this) => S): this & Di<S> {
         const service = new dependency(this);
         (this as any)[service.name] = service;
         return this as any;
