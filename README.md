@@ -9,6 +9,7 @@
 - **Full Type Safety**: Get autocompletion and type checks for all your injected services.
 - **Fluent API**: Chainable service registration makes it easy to compose your container.
 - **Container Composition**: Merge multiple containers together to share dependencies across different parts of your application.
+- **Lazy Construction**: Services are instantiated only on demand (when first accessed).
 - **Zero Runtime Dependencies**: Extremely lightweight.
 
 ## Installation
@@ -21,13 +22,15 @@ npm install di-sacala
 
 ### 1. Defining a Service
 
-A service is a class that implements the `DiService` interface. It must have a `name` property which will be used as the key in the container. Use `as const` to ensure the name is treated as a literal type.
+A service is a class that implements the `DiService` interface. It must implement a `getName()` method which will be used as the key in the container. Use `as const` to ensure the name is treated as a literal type.
 
 ```typescript
 import { DiService } from 'di-sacala';
 
 export class LoggerService implements DiService<"logger"> {
-    name = "logger" as const;
+    getName() {
+        return "logger" as const;
+    }
     
     log(message: string) {
         console.log(`[LOG]: ${message}`);
@@ -59,7 +62,9 @@ import { Di, DiService } from 'di-sacala';
 import { LoggerService } from './LoggerService';
 
 export class UserService implements DiService<"user"> {
-    name = "user" as const;
+    getName() {
+        return "user" as const;
+    }
     
     // Use Di<ServiceType> or Di<[Service1, Service2]> for type-safe dependencies
     constructor(private di: Di<LoggerService>) {}
@@ -89,6 +94,22 @@ const appContainer = new DiContainer()
     .injectContainer(authContainer)
     .injectContainer(apiContainer)
     .inject(MainApp);
+```
+
+### 5. Lazy Construction
+
+Services registered via `inject` are only instantiated when they are first accessed. This allows for efficient container initialization and avoids unnecessary work for services that might not be used in certain execution paths.
+
+```typescript
+const container = new DiContainer()
+    .inject(ExpensiveService);
+
+// ExpensiveService is NOT instantiated yet
+
+console.log("Container ready");
+
+// ExpensiveService is instantiated NOW
+container.expensive.doSomething();
 ```
 
 ## Development
