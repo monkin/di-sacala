@@ -3,7 +3,13 @@
  * The `name` property is used as the key when the service is injected into a DiContainer.
  */
 export interface DiService<Name extends string> {
-    name: Name;
+    /**
+     * The name of the service.
+     * This is used as the key when the service is injected into a DiContainer.
+     *
+     * The method is called without an instance context, so it can be used as a static property.
+     */
+    getName(this: null): Name;
 }
 
 /**
@@ -42,7 +48,7 @@ export class DiContainer {
     ): this & Di<S> {
         let instance: S | undefined;
 
-        Object.defineProperty(this, dependency.name, {
+        Object.defineProperty(this, dependency.prototype.getName(), {
             enumerable: true,
             configurable: false,
             writable: false,
