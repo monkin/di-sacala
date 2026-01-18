@@ -11,8 +11,4 @@ export default defineConfig({
     },
   },
   plugins: [dts({ exclude: ['**/*.test.ts'] })],
-  test: {
-    globals: true,
-    environment: 'node',
-  },
 });
