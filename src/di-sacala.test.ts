@@ -1,24 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { Di, DiContainer, DiService } from './di-sacala';
+import { Di, DiContainer, DiService } from "./di-sacala";
 
 class RandomNumberService implements DiService<"randomNumber"> {
-    name = "randomNumber" as const;
-    constructor() {}
+    getName() {
+        return "randomNumber" as const;
+    }
     next() {
         return Math.random();
     }
 }
 
 class DelayService implements DiService<"delay"> {
-    name = "delay" as const;
-    constructor() {}
+    getName() {
+        return "delay" as const;
+    }
     async wait() {
         return Promise.resolve();
     }
 }
 
 class IdService implements DiService<"id"> {
-    name = "id" as const;
+    getName() {
+        return "id" as const;
+    }
     private counter = 0;
     constructor(private di: Di<RandomNumberService>) {}
     generate() {
@@ -37,7 +41,9 @@ describe("DiContainer", () => {
     });
 
     it("should inject multiple services and they should be accessible", () => {
-        const container = new DiContainer().inject(RandomNumberService).inject(DelayService);
+        const container = new DiContainer()
+            .inject(RandomNumberService)
+            .inject(DelayService);
 
         expect(container.randomNumber).toBeInstanceOf(RandomNumberService);
         expect(container.delay).toBeInstanceOf(DelayService);
@@ -45,14 +51,20 @@ describe("DiContainer", () => {
 
     it("should allow a service to depend on another service", () => {
         class DependentService implements DiService<"dependent"> {
-            name = "dependent" as const;
-            constructor(private di: DiContainer & { randomNumber: RandomNumberService }) {}
+            getName() {
+                return "dependent" as const;
+            }
+            constructor(
+                private di: DiContainer & { randomNumber: RandomNumberService },
+            ) {}
             getWrappedRandom() {
                 return { value: this.di.randomNumber.next() };
             }
         }
 
-        const container = new DiContainer().inject(RandomNumberService).inject(DependentService);
+        const container = new DiContainer()
+            .inject(RandomNumberService)
+            .inject(DependentService);
 
         const result = container.dependent.getWrappedRandom();
         expect(result).toHaveProperty("value");
@@ -60,10 +72,12 @@ describe("DiContainer", () => {
     });
 
     it("should inject IdService and generate ids using RandomNumberService", () => {
-        const container = new DiContainer().inject(RandomNumberService).inject(IdService);
+        const container = new DiContainer()
+            .inject(RandomNumberService)
+            .inject(IdService);
 
         expect(container.id).toBeInstanceOf(IdService);
-        
+
         const id1 = container.id.generate();
         const [counter1, rand1] = id1.split("-");
         expect(counter1).toBe("0");
@@ -79,7 +93,9 @@ describe("DiContainer", () => {
         const container1 = new DiContainer().inject(RandomNumberService);
         const container2 = new DiContainer().inject(DelayService);
 
-        const merged = new DiContainer().injectContainer(container1).injectContainer(container2);
+        const merged = new DiContainer()
+            .injectContainer(container1)
+            .injectContainer(container2);
 
         expect(merged.randomNumber).toBeInstanceOf(RandomNumberService);
         expect(merged.delay).toBeInstanceOf(DelayService);
