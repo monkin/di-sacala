@@ -35,13 +35,13 @@ type Append<Container, Service extends DiService<string>> =
         : never;
 
 type Merge<DI1, DI2> = Exclude<keyof DI1, "inject" | "injectContainer"> &
-    Exclude<DI2, "inject" | "injectContainer"> extends never
+    Exclude<keyof DI2, "inject" | "injectContainer"> extends never
     ? DI1 & DI2
     : `Containers have duplicated keys: ${(Exclude<
           keyof DI1,
           "inject" | "injectContainer"
       > &
-          Exclude<DI2, "inject" | "injectContainer">) &
+          Exclude<keyof DI2, "inject" | "injectContainer">) &
           string}`;
 
 /**
