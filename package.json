@@ -5,23 +5,51 @@
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/di-sacala.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/di-sacala.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.umd.cjs"
+        }
+    },
     "files": [
         "dist"
     ],
+    "sideEffects": false,
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "scripts": {
         "build": "vite build",
         "test": "vitest run",
         "test:watch": "vitest",
         "lint": "eslint src --ext .ts",
         "format": "prettier --write \"src/**/*.ts\"",
-        "format:check": "prettier --check \"src/**/*.ts\""
+        "format:check": "prettier --check \"src/**/*.ts\"",
+        "prepublishOnly": "npm run lint && npm run test && npm run build"
     },
-    "keywords": [],
+    "keywords": [
+        "dependency-injection",
+        "di",
+        "typescript",
+        "type-safe",
+        "container",
+        "ioc",
+        "lightweight"
+    ],
     "author": {
         "name": "Andrei Monkin",
         "email": "monkin.andrey@gmail.com",
         "url": "https://github.com/monkin"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/monkin/di-sacala.git"
+    },
+    "bugs": {
+        "url": "https://github.com/monkin/di-sacala/issues"
+    },
+    "homepage": "https://github.com/monkin/di-sacala#readme",
     "license": "MIT",
     "devDependencies": {
         "@eslint/js": "^9.39.2",
