@@ -56,6 +56,10 @@ type Merge<DI1, DI2> = Exclude<keyof DI1, "inject" | "injectContainer"> &
 const has = (obj: object, key: string | number | symbol): boolean =>
     Object.prototype.hasOwnProperty.call(obj, key);
 
+const fail = (message: string): never => {
+    throw new Error(message);
+};
+
 /**
  * DiContainer manages service instantiation and dependency resolution.
  * It uses a fluent interface to chain service registrations, dynamically
@@ -79,11 +83,11 @@ export class DiContainer {
         const name = dependency.prototype.getServiceName();
 
         if (ReservedFields.has(name)) {
-            throw new Error(`Reserved field name: ${name}`);
+            fail(`Reserved field name: ${name}`);
         }
 
         if (has(this, name)) {
-            throw new Error(`Duplicate service name: ${name}`);
+            fail(`Duplicate service name: ${name}`);
         }
 
         let instance: S | undefined;
@@ -111,7 +115,7 @@ export class DiContainer {
     injectContainer<DC extends DiContainer>(other: DC): Merge<this, DC> {
         for (const key in other) {
             if (has(other, key) && has(this, key)) {
-                throw new Error(`Containers have duplicated keys: ${key}`);
+                fail(`Containers have duplicated keys: ${key}`);
             }
         }
 
