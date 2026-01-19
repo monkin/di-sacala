@@ -90,7 +90,6 @@ export class DiContainer {
 
         Object.defineProperty(this, name, {
             enumerable: true,
-            configurable: false,
             get: () => {
                 // Create the instance on first access
                 return instance ?? (instance = new dependency(this));
@@ -122,7 +121,6 @@ export class DiContainer {
             if (has(other, key)) {
                 Object.defineProperty(this, key, {
                     enumerable: true,
-                    configurable: false,
                     get: () => (other as any)[key],
                 });
             }
