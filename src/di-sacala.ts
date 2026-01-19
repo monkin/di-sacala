@@ -27,6 +27,13 @@ export type Di<S> = S extends [infer S1, ...infer Tail]
         ? { [Key in Name]: S }
         : never;
 
+type Append<Container, Service extends DiService<string>> =
+    Service extends DiService<infer Name>
+        ? Container extends { [Key in Name]: unknown }
+            ? `Duplicate service name: ${Name}`
+            : Container & Di<Service>
+        : never;
+
 /**
  * DiContainer manages service instantiation and dependency resolution.
  * It uses a fluent interface to chain service registrations, dynamically
@@ -45,7 +52,7 @@ export class DiContainer {
      */
     inject<S extends DiService<string>>(
         dependency: new (dependencies: this) => S,
-    ): this & Di<S> {
+    ): Append<this, S> {
         let instance: S | undefined;
 
         Object.defineProperty(this, dependency.prototype.getName(), {
