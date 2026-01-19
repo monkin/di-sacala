@@ -27,11 +27,15 @@ export type Di<S> = S extends [infer S1, ...infer Tail]
         ? { [Key in Name]: S }
         : never;
 
+type CheckReservedField<Name, T> = Name extends keyof DiContainer
+    ? `Reserved field name: ${Name}`
+    : T;
+
 type Append<Container, Service extends DiService<string>> =
     Service extends DiService<infer Name>
         ? Container extends { [Key in Name]: unknown }
             ? `Duplicate service name: ${Name}`
-            : Container & Di<Service>
+            : CheckReservedField<Name, Container & Di<Service>>
         : never;
 
 type Merge<DI1, DI2> = Exclude<keyof DI1, "inject" | "injectContainer"> &
